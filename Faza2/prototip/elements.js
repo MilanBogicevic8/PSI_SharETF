@@ -1,3 +1,4 @@
+// Autor: Aleksa Vučković
 function makePostBase(data) {
     let img = data.img;
     let name = data.name;

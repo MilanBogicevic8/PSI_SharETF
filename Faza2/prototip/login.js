@@ -1,3 +1,4 @@
+// Autor: Aleksa Vučković
 $(document).ready(function() {
     switchToLogin();
     $("#login-button").click(login);

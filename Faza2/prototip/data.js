@@ -1,3 +1,4 @@
+// Autor: Aleksa Vučković
 var posts = [
     {
         img: "images/prof1.png",
