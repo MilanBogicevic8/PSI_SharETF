@@ -36,14 +36,17 @@ var posts = [
         img: "images/prof5.png",
         name: "Jana Janic",
         text: "Volim sport i prirodu.",
-        likenu: 30,
+        likenum: 30,
         commentnum: 10,
         groupName: null
     },
     {
         img: "images/prof6.png",
         name: "Lana Lanic",
-        text: "Metamatika mi odlicno ide"
+        text: "Metamatika mi odlicno ide",
+        likenum: 30,
+        commentnum: 10,
+        groupName: null
     },
     {
         img: "images/prof1.png",
