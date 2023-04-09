@@ -1,0 +1,24 @@
+Napomene i ogranicenja baze:
+
+1.Tabela Osoba
+
+U koloni DaLiJeAdmin false oznacava da nije (odnosno da je registrovan korisnik), a true oznacava da je RegistrovanKorisnik.
+Da bih izbegli pravljenje jo jedne tabele ZahteviZaRegistraciju, postavio sam kolonu OdobrenNalog, cija je default vrednot false, a ako ga administartor postavi na true
+on je odobren.
+
+2. Tabela ZahteviZaPrijateljstvo
+
+U ovoj tabeli se ubacuje osoba koja je poslala zahtev za prijateljstvo(IdO1) i osoba kojoj je poslat zahtev za prijateljstvo(IdO2).
+Ako osoba kojoj je poslat zahtev za prijateljstvo posalje zahtev za prijateljstvo(IdO2) ponovo Osobi IdO1 on se nece evidentirati i ispisacemo poruku:" Osoba IdO1
+Vam je vec poslala zahtev za prijateljstvo, odobrite ga".
+
+Radice iako to ne radimo, ali mislim da je ovako lepse.
+
+3. Tabela LajkKom
+
+U njoj se red ubacuje kad korisnik unese lajk ili komentar za neku objavu.
+Pri ubacivanju samo lajka, i nakon nekog vremena komentar, taj komentar se unosi u isti red.
+
+4. Napomena za Grupne i Profilne objave tabele
+
+Treba proveriti, kad se radi sa bazom, da li radi autoincrement iz nadtabele ili treba i kod njih da se postavlja. 
