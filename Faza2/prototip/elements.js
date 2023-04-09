@@ -44,7 +44,9 @@ function makePost(post) {
                 //Ovde treba preci na stranicu tog konkretnog posta
                 window.location.href="post.html";
             })
-        ).append(commentnumSpan)
+        ).append(commentnumSpan).append(
+            $("<span></span>").addClass("float-end").text("1.1.2021. 12:00:00")
+        )
     )
     return ret;
 }
