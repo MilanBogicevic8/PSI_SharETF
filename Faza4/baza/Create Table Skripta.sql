@@ -11,7 +11,7 @@ Email varchar(200) UNIQUE NOT NULL ,
 Lozinka varchar(200) NOT NULL ,
 Slika varchar(100) NOT NULL ,
 Opis varchar(1000) NOT NULL ,
-Tip char NOT NULL
+Tip char NOT NULL CHECK(Tip = 'A' OR Tip = 'R')
 );
 
 CREATE TABLE Grupa
@@ -79,7 +79,7 @@ ON UPDATE CASCADE
 
 CREATE TABLE Komentar
 (
-IdK int PRIMARY KEY ,
+IdKom int PRIMARY KEY AUTO_INCREMENT,
 IdObj int NOT NULL ,
 Tekst varchar(1000) NOT NULL ,
 IdKom char(18) NOT NULL ,
@@ -109,7 +109,7 @@ FOREIGN KEY (IdK2) REFERENCES Korisnik(IdK) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE ZahtevZaRegistraciju (
-IdZah int PRIMARY KEY,
+IdZah int PRIMARY KEY AUTO_INCREMENT,
 Ime varchar(200) NOT NULL,
 Prezime varchar(200) NOT NULL,
 Email varchar(200) NOT NULL,
