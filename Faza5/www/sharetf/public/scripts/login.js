@@ -1,13 +1,13 @@
 // Autor: Aleksa Vučković
 $(document).ready(function() {
-    switchToLogin();
-    $("#login-button").submit(login);
+    if (registerPage) switchToRegister();
+    else switchToLogin();
+    $("#login-form").submit(login);
     $("#register-link").click(switchToRegister);
     $("#about-link").click(switchToAbout)
-    $("#register-button").submit(register);
+    $("#register-form").submit(register);
     $("#register-back-button").click(switchToLogin)
     $("#about-back-button").click(switchToLogin);
-    localStorage.removeItem("admin");
 })
 function reset() {
     $("#login-email-error").html("");
@@ -55,5 +55,5 @@ function register(event) {
     event.preventDefault();
 }
 function checkEmail(email) {
-    return (/^[a-z]{2}\d{6}[a-z]@student.etf.bg.ac.rs/.test(email));
+    return (/^[a-z]{2}\d{6}[a-z]@student.etf.bg.ac.rs$/.test(email));
 }

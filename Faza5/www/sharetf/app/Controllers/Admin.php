@@ -9,14 +9,26 @@ class Admin extends BaseController
     public function group()
     {
         //vraca stranicu admin-group
-        $data = ["user" => TestData::$user];
+        $data = ["user" => TestData::$user, "success" => false];
         echo view("template/header", $data);
         echo view("pages/admin-group", $data);
         return;
     }
     public function addGroup() {
         //proverava polja i dodaje grupu za ulogovanog admina
-        return redirect()->to(site_url("Admin/group"));
+        $data = ["user" => TestData::$user, "success" => false];
+        if (!$this->validate('admingroup')) {
+            $data['errors'] = $this->validator->getErrors();
+            echo view("template/header", $data);
+            echo view("pages/admin-group", $data);
+            return;
+        }
+        else {
+            $data['success'] = true;
+            echo view("template/header", $data);
+            echo view("pages/admin-group", $data);
+            return;
+        }
     }
     public function requests() {
         //vraca stranicu sa svim zahtevima za registraciju
