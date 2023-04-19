@@ -1,18 +1,27 @@
 <?php
 
 namespace App\Controllers;
+use App\Models\Post;
+use CodeIgniter\HTTP\RequestInterface;
+use CodeIgniter\HTTP\ResponseInterface;
+use Psr\Log\LoggerInterface;
 
 include_once("TestData.php");
 
 class User extends BaseController
 {
+    private $data = [];
+    public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
+    {
+        parent::initController($request, $response, $logger);
+        $this->data['user'] = $this->session->get('user');
+    }
     public function feed()
     {
-        $data = ["user" => TestData::$user];
         //vraca feed za ulogovanog korisnika
-        $this->showPage('feed', $data);
+        $this->showPage('feed', $this->data);
     }
-    public function getPosts($datetime)
+    public function getPosts()
     {
         //vraca narednih 20 objava za ulogovanog korisnika, pocev od prosledjenog datuma unazad, u json formatu
         //postovi koji se vracaju zavise od stranice na kojoj se nalazi korisnik:
@@ -21,6 +30,7 @@ class User extends BaseController
         //  3. Profil prijatelja -> Svi postovi tog korisnika
         //  4. Profil ne-prijatelja -> Samo grupni postovi tog korisnika
         //Zbog ovoga treba pamtiti u okviru sesije na kojoj je stranici korisnik, i za profilnu stranicu koji je id korisnika
+        //U session['page'] cuva se stranica (feed, group, profile, myprofile), a u session['pageid'] id profila za stranicu profile, odnosno id grupe za stranicu grupe.
         //Na taj nacin ce se na svim stranicama na front-endu uniformno implementirati dinamicko ucitavanje postova
         /* format u kom se vracaju postovi je sledeci:
             {
@@ -39,7 +49,19 @@ class User extends BaseController
             }
         groupid i groupname postoje samo za grupne postove, a img samo za postove sa slikom. Vraca se niz od maksimalno 20 ovakvih objekata
         polje liked = 0 znaci da ulogovani korisnik nije lajkova post, a 1 da jeste*/
-        echo json_encode(TestData::$posts);
+        /*echo var_dump($this->session->get());
+        echo $lasttime;*/
+        $lasttime = $this->request->getVar("lasttime");
+        $p = new Post();
+        $page = $this->session->get("page");
+        $userid = $this->session->get("user")['id'];
+        $pageid = $this->session->get("pageid");
+        if ($page == 'feed') $posts = $p->getFeedPosts($lasttime, $userid);
+        else if ($page == 'group' && $pageid != null) $posts = $p->getGroupPosts($lasttime, $userid, $pageid);
+        else if (($page == 'profile' || $page == 'myprofile') && $pageid != null) $posts = $p->getProfilePosts($lasttime, $userid, $pageid);
+        else $posts = [];
+        echo json_encode($posts);
+        return;
     }
     public function like($id)
     {
@@ -53,19 +75,20 @@ class User extends BaseController
     {
         //proverava polja i evidentira novu objavu
         //vraca stranicu feed
-        $data = ['user' => TestData::$user];
-        if (!$this->validate('post')) $data['error'] = $this->combineErrors();
+        if (!$this->validate('post')) $this->data['error'] = $this->combineErrors();
         else {
             //dodati post u bazu
         }
-        $this->showPage('feed', $data);
+        $this->showPage('feed', $this->data);
         return;
     }
 
     public function group($id) {
         //vraca stranicu grupe id
-        $data = ["user" => TestData::$user, "group" => TestData::$group, "joined" => true];
-        $this->showPage('group', $data);
+        $this->data["group"] = TestData::$group;
+        $this->data["joined"] = true;
+        $this->session->set('pageid', $id);
+        $this->showPage('group', $this->data);
         return;
     }
     public function joinGroup($id) {
@@ -78,31 +101,33 @@ class User extends BaseController
     public function groupPost($id) {
         //proverava polja i evidentira novu objavu u grupi id
         //vraca stranicu group
-        $data = ["user" => TestData::$user, "group" => TestData::$group, "joined" => true];
-        if (!$this->validate('post')) $data['error'] = $this->combineErrors();
+        $this->data["group"] = TestData::$group;
+        $this->data["joined"] = true;
+        if (!$this->validate('post')) $this->data['error'] = $this->combineErrors();
         else {
             //dodati post u bazu
         }
-        $this->showPage('group', $data);
+        $this->showPage('group', $this->data);
         return;
     }
 
     public function profile($id) {
         //vraca profilnu stranicu
         //ako je id ulogovanog korisnika, onda vraca stranicu sa opcijom izmene profila
-        $data = ["user" => TestData::$user, "groups" => [TestData::$group]];
-        $this->showPage('myprofile', $data);
+        $this->data["groups"] = [TestData::$group];
+        $this->session->set('pageid', $id);
+        $this->showPage('myprofile', $this->data);
         return;
     }
     public function updateProfile() {
         //azurira informacije profila ulogovanog korisnika
         //vraca stranicu profila sa azuriranim informacijama
-        $data = ["user" => TestData::$user, "groups" => [TestData::$group]];
-        if (!$this->validate('myprofile'))  $data['error'] = $this->combineErrors();
+        $this->data["groups"] = [TestData::$group];
+        if (!$this->validate('myprofile'))  $this->data['error'] = $this->combineErrors();
         else {
             //evidentirati promene
         }
-        $this->showPage('myprofile', $data);
+        $this->showPage('myprofile', $this->data);
         return;
     }
     public function sendRequest($id) {
@@ -119,30 +144,24 @@ class User extends BaseController
     function comments($id) {
         //prikazuje stranicu sa komentarima za post id
         //proverava i da li ulogovani korisnik ima pravo pristupa do te objave (nema ako je privatna a autor nije prijatelj ulogovanog korisnika)
-        $data = [
-            "user" => TestData::$user,
-            "post" => TestData::$posts[0],
-            "comments" => TestData::$comments
-        ];
-        $this->showPage('post', $data);
+        $this->data["post"] = TestData::$posts[0];
+        $this->data['comments'] = TestData::$comments;
+        $this->showPage('post', $this->data);
         return;
     }
     function addComment($id) {
         //dodaje komentar na post id, za ulogovanog korisnika
         //vraca stranicu sa azuriranim komentarima
-        $data = [
-            "user" => TestData::$user,
-            "post" => TestData::$posts[0],
-            "comments" => TestData::$comments
-        ];
-        if (!$this->validate('comment')) $data['error'] = $this->combineErrors();
-        $this->showPage('post', $data);
+        $this->data["post"] = TestData::$posts[0];
+        $this->data['comments'] = TestData::$comments;
+        if (!$this->validate('comment')) $this->data['error'] = $this->combineErrors();
+        $this->showPage('post', $this->data);
     }
 
     function requests() {
         //prikazuje stranicu sa zahtevima za prijateljstvo za ulogovanog korisnika,
-        $data = ["user" => TestData::$user, "requests" => TestData::$requests];
-        $this->showPage('requests', $data);
+        $this->data["requests"] = TestData::$requests;
+        $this->showPage('requests', $this->data);
         return;
     }
     function respond($id, $response) {
@@ -151,8 +170,7 @@ class User extends BaseController
     }
 
     public function search() {
-        $data = ["user" => TestData::$user];
-        $this->showPage('search', $data);
+        $this->showPage('search', $this->data);
     }
     public function getSearchResults($term, $type) {
         //vraca json listu rezultata pretrage

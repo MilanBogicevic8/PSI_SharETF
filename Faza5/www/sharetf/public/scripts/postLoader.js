@@ -1,4 +1,4 @@
-lastPostDate = "now";
+lastPostDate = "2036/01/01 12:00:00";
 currentlyFetching = false;
 
 function bottom() {
@@ -10,7 +10,7 @@ function loadMorePosts(postMaker) {
     currentlyFetching = true;
     let xhr = new XMLHttpRequest();
 
-    xhr.open('GET', '/sharetf/public/index.php/User/getPosts/' + lastPostDate, true);
+    xhr.open('GET', '/sharetf/public/index.php/User/getPosts?lasttime=' + lastPostDate, true);
 
     xhr.onload = function() {
         if (this.status == 200) {

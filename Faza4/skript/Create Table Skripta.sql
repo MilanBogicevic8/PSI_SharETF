@@ -1,6 +1,6 @@
-DROP DATABASE IF EXISTS `ShareETF`;
-CREATE DATABASE `ShareETF`;
-USE `ShareETF`;
+DROP DATABASE IF EXISTS `SharETF`;
+CREATE DATABASE `SharETF`;
+USE `SharETF`;
 
 CREATE TABLE Korisnik
 (
@@ -103,3 +103,46 @@ Email varchar(200) NOT NULL,
 Lozinka varchar(200) NOT NULL,
 Slika varchar(100) NOT NULL
 );
+
+
+delimiter $$
+create function likenum(
+	postid int
+) 
+returns int
+begin
+	declare ret int;
+	select count(*) into ret from lajkovao where idobj = postid;
+    return ret;
+END$$
+
+create function liked( postid int, userid int ) returns int
+begin
+	declare ret int;
+	select count(*) into ret from lajkovao where idobj = postid and idk = userid;
+    return ret;
+end$$
+
+create function commentnum( postid int ) returns int
+begin
+	declare ret int;
+	select count(*) into ret from komentar where idobj = postid;
+    return ret;
+end$$
+
+create function arefriends( user1 int, user2 int ) returns boolean
+begin
+	declare ret boolean;
+    select exists(select * from jeprijatelj where idk1 = user1 and idk2 = user2 or idk1 = user2 and idk2 = user1) into ret;
+    select (ret or (user1 = user2)) into ret;
+    return ret;
+end$$
+
+create function ismember( groupid int, userid int ) returns boolean
+begin
+	declare ret boolean;
+    select exists(select * from jeclan where idk = userid and idg = groupid) into ret;
+    return ret;
+end$$
+
+delimiter ;

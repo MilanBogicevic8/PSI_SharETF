@@ -57,6 +57,7 @@ abstract class BaseController extends Controller
     }
 
     protected function showPage($page, $data) {
+        $this->session->set('page', $page);
         echo view("template/header", $data);
         echo view("pages/$page", $data);
     }
