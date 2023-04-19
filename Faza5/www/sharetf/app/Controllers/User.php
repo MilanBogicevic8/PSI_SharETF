@@ -10,8 +10,7 @@ class User extends BaseController
     {
         $data = ["user" => TestData::$user];
         //vraca feed za ulogovanog korisnika
-        echo view("template/header", $data);
-        echo view("pages/feed", $data);
+        $this->showPage('feed', $data);
     }
     public function getPosts($datetime)
     {
@@ -54,14 +53,19 @@ class User extends BaseController
     {
         //proverava polja i evidentira novu objavu
         //vraca stranicu feed
-        return redirect()->to(site_url("pages/feed"));
+        $data = ['user' => TestData::$user];
+        if (!$this->validate('post')) $data['error'] = $this->combineErrors();
+        else {
+            //dodati post u bazu
+        }
+        $this->showPage('feed', $data);
+        return;
     }
 
     public function group($id) {
         //vraca stranicu grupe id
         $data = ["user" => TestData::$user, "group" => TestData::$group, "joined" => true];
-        echo view("template/header", $data);
-        echo view("pages/group", $data);
+        $this->showPage('group', $data);
         return;
     }
     public function joinGroup($id) {
@@ -74,21 +78,32 @@ class User extends BaseController
     public function groupPost($id) {
         //proverava polja i evidentira novu objavu u grupi id
         //vraca stranicu group
-        return redirect()->to(site_url("User/group/$id"));
+        $data = ["user" => TestData::$user, "group" => TestData::$group, "joined" => true];
+        if (!$this->validate('post')) $data['error'] = $this->combineErrors();
+        else {
+            //dodati post u bazu
+        }
+        $this->showPage('group', $data);
+        return;
     }
 
     public function profile($id) {
         //vraca profilnu stranicu
         //ako je id ulogovanog korisnika, onda vraca stranicu sa opcijom izmene profila
         $data = ["user" => TestData::$user, "groups" => [TestData::$group]];
-        echo view("template/header", $data);
-        echo view("pages/myprofile", $data);
+        $this->showPage('myprofile', $data);
         return;
     }
     public function updateProfile() {
         //azurira informacije profila ulogovanog korisnika
         //vraca stranicu profila sa azuriranim informacijama
-        return redirect()->to(site_url("User/profile/1"));
+        $data = ["user" => TestData::$user, "groups" => [TestData::$group]];
+        if (!$this->validate('myprofile'))  $data['error'] = $this->combineErrors();
+        else {
+            //evidentirati promene
+        }
+        $this->showPage('myprofile', $data);
+        return;
     }
     public function sendRequest($id) {
         //salje zahtev za prijateljstvo od ulogovanog korisnika ka korisniku id
@@ -109,21 +124,25 @@ class User extends BaseController
             "post" => TestData::$posts[0],
             "comments" => TestData::$comments
         ];
-        echo view("template/header", $data);
-        echo view("pages/post", $data);
+        $this->showPage('post', $data);
         return;
     }
     function addComment($id) {
         //dodaje komentar na post id, za ulogovanog korisnika
         //vraca stranicu sa azuriranim komentarima
-        return redirect()->to(site_url("User/comments/1"));
+        $data = [
+            "user" => TestData::$user,
+            "post" => TestData::$posts[0],
+            "comments" => TestData::$comments
+        ];
+        if (!$this->validate('comment')) $data['error'] = $this->combineErrors();
+        $this->showPage('post', $data);
     }
 
     function requests() {
         //prikazuje stranicu sa zahtevima za prijateljstvo za ulogovanog korisnika,
         $data = ["user" => TestData::$user, "requests" => TestData::$requests];
-        echo view("template/header", $data);
-        echo view("pages/requests", $data);
+        $this->showPage('requests', $data);
         return;
     }
     function respond($id, $response) {
@@ -133,8 +152,7 @@ class User extends BaseController
 
     public function search() {
         $data = ["user" => TestData::$user];
-        echo view("template/header", $data);
-        echo view("pages/search", $data);
+        $this->showPage('search', $data);
     }
     public function getSearchResults($term, $type) {
         //vraca json listu rezultata pretrage
@@ -158,5 +176,12 @@ class User extends BaseController
         //brise session
         //vraca na login stranicu
         return redirect()->to(site_url("Login/index"));
+    }
+
+    private function combineErrors() {
+        $errors = $this->validator->getErrors();
+        $msg = "";
+        foreach($errors as $error) $msg .= $error . "</br>";
+        return $msg;
     }
 }

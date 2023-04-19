@@ -29,11 +29,10 @@
                                 </div>
                                 <div id="admin-group-error" class="form-text text-danger">
                                     <?php 
-                                        $line = false;
-                                        if (!empty($errors['name'])) { echo $errors['name']; $line = true; }
-                                        if (!empty($errors['img'])) {
-                                            if ($line) echo "</br>";
-                                            echo $errors['img'];
+                                        if(!empty($errors)) {
+                                            foreach($errors as $error) {
+                                                echo $error; echo "</br>";
+                                            }
                                         }
                                     ?>
                                 </div>

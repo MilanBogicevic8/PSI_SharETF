@@ -63,12 +63,12 @@ function makePostWithGroup(post) {
     return ret;
 }
 
-function makePostInput(profile, action) {
+function makePostInput(profile, action, text, error) {
     let ret = makePostBase(profile);
     ret.addClass("bg-light");
     ret.find(".post-content").append(
         $("<form></form>").attr("method", "post").attr("action", action).attr("enctype", "multipart/form-data").append(
-            $("<textarea></textarea>").addClass("form-control mb-1").attr("name", "text")
+            $("<textarea></textarea>").addClass("form-control mb-1").attr("name", "text").text(text)
         ).append(
             $("<label></label>").attr("for", "post-input-image").addClass("form-label mb-0").html("Dodaj sliku: ")
         ).append(
@@ -76,7 +76,10 @@ function makePostInput(profile, action) {
         ).append(
             $("<input></input>").attr("type", "submit").addClass("btn btn-primary mt-2").html("Objavi")
         )
-    )
+    );
+    if (error) ret.append(
+        $("<div></div>").addClass("form-text text-danger").html(error)
+    );
     return ret;
 }
 function makeComment(comment) {
@@ -89,15 +92,18 @@ function makeComment(comment) {
     return ret;
 }
 
-function makeCommentInput(profile, postid) {
+function makeCommentInput(profile, postid, text, error) {
     let ret = makePostBase(profile).addClass("bg-light");
     ret.find(".post-content").append(
         $("<form></form>").attr("method", "post").attr("action", "/sharetf/public/index.php/User/addComment/" + postid).append(
-            $("<textarea></textarea>").addClass("form-control mb-1")
+            $("<textarea></textarea>").addClass("form-control mb-1").attr('name', 'text').text(text)
         ).append(
-            $("<input></input>").attr("type", "submit").addClass("btn btn-primary mt-2").html("Objavi")
+            $("<input></input>").attr("type", "submit").addClass("btn btn-primary mt-2").attr("value", "Objavi")
         )
-    )
+    );
+    if (error) ret.append(
+        $("<div></div>").addClass("form-text text-danger").html(error)
+    );
     return ret;
 }
 

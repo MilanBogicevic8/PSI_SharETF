@@ -59,13 +59,17 @@ class Validation extends BaseConfig
     // Rules
     // --------------------------------------------------------------------
     public $admingroup = [
-        'name'     => 'required',
-        //'text'     => 'required',
+        'name'     => 'required|max_length[200]',
+        'text'     => 'max_length[1000]',
         'img' => 'uploaded[img]|ext_in[img,png,jpg,jpeg]',
     ];
     public $admingroup_errors = [
         'name' => [
             'required' => 'Ime je obavezno.',
+            'max_length' => 'Maksimalna dužina imena je 200 karaktera.'
+        ],
+        'text' => [
+            'max_length' => 'Maksimalna dužina opisa je 1000 karaktera.'
         ],
         'img' => [
             'uploaded' => 'Slika je obavezna.',
@@ -90,11 +94,11 @@ class Validation extends BaseConfig
 
     public $register = [
         'email' => 'required|checkEmailFormat',
-        'name' => 'required',
-        'lastname' => 'required',
-        'password' => 'required',
+        'name' => 'required|max_length[200]',
+        'lastname' => 'required|max_length[200]',
+        'password' => 'required|max_length[200]',
         'password2' => 'required|matches[password]',
-        //'img' => 'uploaded[img]|ext_in[img,png,jpg,jpeg]'
+        'img' => 'ext_in[img,png,jpg,jpeg]'
     ];
     public $register_errors = [
         'email' => [
@@ -103,12 +107,15 @@ class Validation extends BaseConfig
         ],
         'name' => [
             'required' => 'Unesite ime.',
+            'max_length' => 'Maksimalna dužina imena je 200 karaktera.'
         ],
         'lastname' => [
             'required' => 'Unesite prezime',
+            'max_length' => 'Maksimalna dužina prezimena je 200 karaktera.'
         ],
         'password' => [
             'required' => 'Unesite lozinku.',
+            'max_length' => 'Maksimalna dužina lozinke je 200 karaktera.'
         ],
         'password2' => [
             'required' => 'Unesite lozinku ponovo.',
@@ -118,6 +125,36 @@ class Validation extends BaseConfig
             'ext_in' => 'Dozvoljeni su samo png, jpg i jpeg fajlovi.'
         ]
     ];
+    
+    public $post = [
+        'text' => 'max_length[1000]',
+        'img' => 'ext_in[img,png,jpg,jpeg]'
+    ];
+    public $post_errors = [
+        'text' => [
+            'max_length' => 'Maksimalna dužina objave je 1000 karaktera.'
+        ],
+        'img' => [
+            'ext_in' => 'Dozvoljeni su samo png, jpg i jpeg fajlovi.'
+        ]
+    ];
 
+    public $myprofile = [
+        'text' => 'max_length[1000]'
+    ];
+    public $myprofile_errors = [
+        'text' => [
+            'max_length' => 'Maksimalna dužina opisa je 1000 karaktera.'
+        ]
+    ];
+
+    public $comment = [
+        'text' => 'max_length[1000]'
+    ];
+    public $comment_errors = [
+        'text' => [
+            'max_length' => 'Maksimalna dužina komentara je 1000 karaktera.'
+        ]
+    ];
 
 }

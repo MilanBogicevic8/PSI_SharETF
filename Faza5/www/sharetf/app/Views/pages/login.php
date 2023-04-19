@@ -96,8 +96,16 @@
             </div>
         </div>
     </body>
-    <script>
-        registerPage = <?= $register ? "true" : "false" ?>;
-    </script>
     <script src = "/sharetf/public/scripts/login.js"></script>
+    <script>
+        $(document).ready(function() {
+            <?= $register ? "switchToRegister()" : "switchToLogin()" ?>;
+            $("#login-form").submit(login);
+            $("#register-link").click(switchToRegister);
+            $("#about-link").click(switchToAbout)
+            $("#register-form").submit(register);
+            $("#register-back-button").click(switchToLogin)
+            $("#about-back-button").click(switchToLogin);
+        })
+    </script>
 </html>

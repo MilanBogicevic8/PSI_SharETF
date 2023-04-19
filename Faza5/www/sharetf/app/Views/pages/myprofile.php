@@ -1,20 +1,21 @@
-<!-- $user = {"name", "text", "img"}, $groups = [{"id", "img", "name"}] -->
+<!-- $user = {"name", "text", "img"}, $groups = [{"id", "img", "name"}], ?$error -->
             <div id = "profile-info" class = "bg-logo-blue-light">
               <div class="row border-bottom border-bottom-5 p-2 profile-info">
                 <div class="col-2"><img src="<?= $user['img']?>" width="100%" class="rounded-1"></div>
-                <div class="col-10" id = "profile-not-editing">
+                <div class="col-10" id = "profile-not-editing" <?= empty($error) ? "" : "style='display: none;'"?>>
                   <h2><?= $user["name"] ?></h2>
                   <p><?= $user["text"] ?></p>
                   <i class="fa-solid fa-pen-to-square"></i>
                 </div>
-                <div class="col-10" style="display: none;" id = "profile-editing">
+                <div class="col-10" <?= !empty($error) ? "" : "style='display: none;'"?> id = "profile-editing">
                   <form method = "post" action = "/sharetf/public/index.php/User/updateProfile" enctype="multipart/form-data">
                   <h2><?= $user["name"] ?></h2>
-                  <textarea class="form-control mb-1" name = "text"><?= $user["text"] ?></textarea>
+                  <textarea class="form-control mb-1" name = "text"><?= empty($error) ? $user["text"] : set_value('text') ?></textarea>
                   <label for="edit-photo" class="form-label">Ukoliko želite da promenite sliku, odaberite fajl:</label>
                   <input type="file" class="form-control mb-2" id="edit-photo" name = "img">
                   <input type="submit" class="btn btn-secondary" value = "Sačuvaj">
                   <button type="button" class="btn btn-secondary" id = "edit-back-button">Nazad</button>
+                  <div class = "form-text text-danger"><?= empty($error) ? "" : $error ?></div>
                   </form>
                 </div>
               </div>

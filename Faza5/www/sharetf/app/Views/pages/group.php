@@ -1,4 +1,4 @@
-<!-- $user = {"id", "name", "img"}, $group = {"img", "name", "text", "members", "id"}, $joined -->
+<!-- $user = {"id", "name", "img"}, $group = {"img", "name", "text", "members", "id"}, $joined, ?$error -->
             <div class="row">
                 <div class="col-9" id = "group-main">
                   <div class="row border-bottom border-bottom-5 p-2 group-info">
@@ -31,7 +31,7 @@
               "?>
             }
             $(document).ready(function() {
-              $("#posts").append(makePostInput(user, "/sharetf/public/index.php/User/groupPost/<?=$group['id']?>"))
+              $("#posts").append(makePostInput(user, "/sharetf/public/index.php/User/groupPost/<?=$group['id']?>", <?= empty($error) ? "'', null" : "`" . set_value('text') . "`, '$error'" ?>));
               loadMorePosts(makePost);
               $(window).scroll(function() {
                 loadMorePosts(makePost);

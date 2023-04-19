@@ -1,4 +1,4 @@
-<!-- $user = {"id", "img", "name"} -->
+<!-- $user = {"id", "img", "name"}, ?$error -->
             <div class="row">
                 <div class="col-9">
                   <div class="row">
@@ -29,7 +29,7 @@
               ?>
             };
             $(document).ready(function() {
-              $("#posts").append(makePostInput(user, "/sharetf/public/index.php/User/privatePost"));
+              $("#posts").append(makePostInput(user, "/sharetf/public/index.php/User/privatePost", <?= empty($error) ? "'', null" : "`" . set_value('text') . "`, '$error'" ?>));
               loadMorePosts(makePostWithGroup);
               $(window).scroll(function() {
                 loadMorePosts(makePostWithGroup);

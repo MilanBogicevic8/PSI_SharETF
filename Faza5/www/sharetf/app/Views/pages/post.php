@@ -1,5 +1,5 @@
 <!-- $post = [{"id", "text", "likenum", "liked", "commentnum", "img", "date", "userid", "username", "groupid", "groupname"}],
-$user = {"userid", "img", "username"}, $comments = [{"username", "userid", "userimg", "text"}] -->
+$user = {"userid", "img", "username"}, $comments = [{"username", "userid", "userimg", "text"}], ?$error -->
             <div class="row">
                 <div class="col-12 pt-3">
                     <h2>Komentari</h2>
@@ -56,7 +56,7 @@ $user = {"userid", "img", "username"}, $comments = [{"username", "userid", "user
             ]
             $(document).ready(function() {
               $("#post-main").append(makePostWithGroup(post));
-              $("#post-comments").append(makeCommentInput(user, post.id));
+              $("#post-comments").append(makeCommentInput(user, post.id, <?= empty($error) ? "'', null" : "`" . set_value('text') . "`, '$error'" ?>));
               for (let i = 0; i < comments.length; i++) {
                 $("#post-comments").append(makeComment(comments[i]));
               }

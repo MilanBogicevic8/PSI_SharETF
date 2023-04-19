@@ -1,14 +1,3 @@
-// Autor: Aleksa Vučković
-$(document).ready(function() {
-    if (registerPage) switchToRegister();
-    else switchToLogin();
-    $("#login-form").submit(login);
-    $("#register-link").click(switchToRegister);
-    $("#about-link").click(switchToAbout)
-    $("#register-form").submit(register);
-    $("#register-back-button").click(switchToLogin)
-    $("#about-back-button").click(switchToLogin);
-})
 function reset() {
     $("#login-email-error").html("");
     $("#login-password-error").html("");
