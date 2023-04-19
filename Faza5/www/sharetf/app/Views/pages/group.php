@@ -6,7 +6,7 @@
                     <div class="col-8">
                       <h2><?= $group["name"] ?></h2>
                       <p><?= $group["text"] ?></p>
-                      <p>Broj članova: <?= $group["members"] ?></p><button type="button" id = "join-button" class="btn <?= $joined ? "btn-secondary" : "btn-primary" ?>"><?= $joined ? "Učlani se" : "Iščlani se" ?></button>
+                      <p>Broj članova: <?= $group["members"] ?></p><button type="button" id = "join-button" class="btn <?= $joined ? "btn-secondary" : "btn-primary" ?>"><?= $joined ? "Iščlani se" : "Učlani se" ?></button>
                     </div>
                   </div>
                   <div class="row">

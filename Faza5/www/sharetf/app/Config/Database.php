@@ -43,6 +43,22 @@ class Database extends Config
         'failover' => [],
         'port'     => 3306,
     ];
+    public static function getConnection() {
+        $db = new Database();
+        return new \mysqli($db->default['hostname'], $db->default['username'], $db->default['password'], $db->default['database']);
+    }
+    public static function fetchResults($stmt) {
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $ret = [];
+        while (true) {
+            $t = $result->fetch_array();
+            if ($t == null) break;
+            $ret[] = $t;
+        }
+        $result->free();
+        return $ret;
+    }
 
     /**
      * This database connection is used when

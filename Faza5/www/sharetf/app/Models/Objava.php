@@ -47,46 +47,30 @@ class Objava extends Model
         private function groupQuery() {//userid, lasttime, groupid
             return $this->makeQuery("o.idg = ?");
         }
-        private function getConnection() {
-            $db = new Database();
-            return new \mysqli($db->default['hostname'], $db->default['username'], $db->default['password'], $db->default['database']);
-        }
-        private function fetchResults($stmt) {
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $ret = [];
-            while (true) {
-                $t = $result->fetch_array();
-                if ($t == null) break;
-                $ret[] = $t;
-            }
-            $result->free();
-            return $ret;
-        }
         public function getFeedPosts($lasttime, $userid) {
+            $conn = Database::getConnection();
             $query = $this->feedQuery();
-            $conn = $this->getConnection();
             $stmt = $conn->prepare($query);
             $stmt->bind_param("isii", $userid, $lasttime, $userid, $userid);
-            $ret = $this->fetchResults($stmt);
+            $ret = Database::fetchResults($stmt);
             $conn->close();
             return $ret;
         }
         public function getProfilePosts($lasttime, $userid, $profileid) {
+            $conn = Database::getConnection();
             $query = $this->profileQuery();
-            $conn = $this->getConnection();
             $stmt = $conn->prepare($query);
             $stmt->bind_param("isiii", $userid, $lasttime, $profileid, $profileid, $userid);
-            $ret = $this->fetchResults($stmt);
+            $ret = Database::fetchResults($stmt);
             $conn->close();
             return $ret;
         }
         public function getGroupPosts($lasttime, $userid, $groupid) {
+            $conn = Database::getConnection();
             $query = $this->groupQuery();
-            $conn = $this->getConnection();
             $stmt = $conn->prepare($query);
             $stmt->bind_param("isi", $userid, $lasttime, $groupid);
-            $ret = $this->fetchResults($stmt);
+            $ret = Database::fetchResults($stmt);
             $conn->close();
             return $ret;
         }
@@ -111,17 +95,17 @@ class Objava extends Model
 
         //lajkovi
         public function liked($userid, $postid) {
-            $conn = $this->getConnection();
+            $conn = Database::getConnection();
             $query = "select * from lajkovao where idk = ? and idobj = ?";
             $stmt = $conn->prepare($query);
             $stmt->bind_param("ii", $userid, $postid);
-            $results = $this->fetchResults($stmt);
+            $results = Database::fetchResults($stmt);
             $ret = count($results) > 0;
             $conn->close();
             return $ret;
         }
         public function like($userid, $postid) {
-            $conn = $this->getConnection();
+            $conn = Database::getConnection();
             $query = "insert into lajkovao(idk, idobj) values(?, ?)";
             $stmt = $conn->prepare($query);
             $stmt->bind_param("ii", $userid, $postid);
@@ -130,7 +114,7 @@ class Objava extends Model
             return $ret;
         }
         public function unlike($userid, $postid) {
-            $conn = $this->getConnection();
+            $conn = Database::getConnection();
             $query = "delete from lajkovao where idk = ? and idobj = ?";
             $stmt = $conn->prepare($query);
             $stmt->bind_param("ii", $userid, $postid);

@@ -2,9 +2,11 @@
 
 namespace App\Controllers;
 use App\Models\Objava;
+use App\Models\Grupa;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
+
 
 include_once("TestData.php");
 
@@ -110,9 +112,11 @@ class User extends BaseController
 
     public function group($id) {
         //vraca stranicu grupe id
-        $this->data["group"] = TestData::$group;
-        $this->data["joined"] = true;
-        $this->session->set('pageid', (int)$id);
+        $id = (int)$id;
+        $g = new Grupa();
+        $this->data["group"] = $group = $g->getGroup($id);
+        $this->data["joined"] = $g->joined($id, $this->data['user']['id']);
+        $this->session->set('pageid', $id);
         $this->showPage('group', $this->data);
         return;
     }
@@ -120,7 +124,11 @@ class User extends BaseController
         //uclanjuje/iscalnjuje ulogovanog korisnika iz grupe id
         //  1. Ako je korisnik uclanjen, izbacuje ga
         //  2. Ako korisnik nije uclanjen, uclanjuje ga
-        //vraca strnaicu group
+        //vraca stranicu group
+        $id = (int)$id;
+        $g = new Grupa();
+        if ($g->joined($id, $this->data['user']['id'])) $g->unjoin($id, $this->data['user']['id']);
+        else $g->join($id, $this->data['user']['id']);
         return redirect()->to(site_url("User/group/$id"));
     }
     public function groupPost($id) {
