@@ -27,7 +27,7 @@ CREATE TABLE Objava
 IdObj int PRIMARY KEY AUTO_INCREMENT ,
 Tekst varchar(1000) NOT NULL ,
 Slika varchar(100) DEFAULT NULL ,
-DatumVreme datetime NOT NULL ,
+DatumVreme timestamp NOT NULL ,
 IdK int NOT NULL ,
 IdG int DEFAULT NULL, 
 FOREIGN KEY (IdK) REFERENCES Korisnik(IdK)
