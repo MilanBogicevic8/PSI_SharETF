@@ -3,7 +3,7 @@
 use CodeIgniter\Model;
 use Config\Database;
 
-class Post extends Model
+class Objava extends Model
 {
         protected $table      = 'objava';
         protected $primaryKey = 'idobj';
@@ -51,7 +51,7 @@ class Post extends Model
             $db = new Database();
             return new \mysqli($db->default['hostname'], $db->default['username'], $db->default['password'], $db->default['database']);
         }
-        private function fetchPosts($stmt) {
+        private function fetchResults($stmt) {
             $stmt->execute();
             $result = $stmt->get_result();
             $ret = [];
@@ -68,7 +68,7 @@ class Post extends Model
             $conn = $this->getConnection();
             $stmt = $conn->prepare($query);
             $stmt->bind_param("isii", $userid, $lasttime, $userid, $userid);
-            $ret = $this->fetchPosts($stmt);
+            $ret = $this->fetchResults($stmt);
             $conn->close();
             return $ret;
         }
@@ -77,7 +77,7 @@ class Post extends Model
             $conn = $this->getConnection();
             $stmt = $conn->prepare($query);
             $stmt->bind_param("isiii", $userid, $lasttime, $profileid, $profileid, $userid);
-            $ret = $this->fetchPosts($stmt);
+            $ret = $this->fetchResults($stmt);
             $conn->close();
             return $ret;
         }
@@ -86,10 +86,39 @@ class Post extends Model
             $conn = $this->getConnection();
             $stmt = $conn->prepare($query);
             $stmt->bind_param("isi", $userid, $lasttime, $groupid);
-            $ret = $this->fetchPosts($stmt);
+            $ret = $this->fetchResults($stmt);
             $conn->close();
             return $ret;
         }
-        
+
+        //lajkovi
+        public function liked($userid, $postid) {
+            $conn = $this->getConnection();
+            $query = "select * from lajkovao where idk = ? and idobj = ?";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("ii", $userid, $postid);
+            $results = $this->fetchResults($stmt);
+            $ret = count($results) > 0;
+            $conn->close();
+            return $ret;
+        }
+        public function like($userid, $postid) {
+            $conn = $this->getConnection();
+            $query = "insert into lajkovao(idk, idobj) values(?, ?)";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("ii", $userid, $postid);
+            $ret = $stmt->execute();
+            $conn->close();
+            return $ret;
+        }
+        public function unlike($userid, $postid) {
+            $conn = $this->getConnection();
+            $query = "delete from lajkovao where idk = ? and idobj = ?";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("ii", $userid, $postid);
+            $ret = $stmt->execute();
+            $conn->close();
+            return $ret;
+        }
         
 }

@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Controllers;
-use App\Models\Post;
+use App\Models\Objava;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -52,23 +52,37 @@ class User extends BaseController
         /*echo var_dump($this->session->get());
         echo $lasttime;*/
         $lasttime = $this->request->getVar("lasttime");
-        $p = new Post();
+        $o = new Objava();
         $page = $this->session->get("page");
         $userid = $this->session->get("user")['id'];
         $pageid = $this->session->get("pageid");
-        if ($page == 'feed') $posts = $p->getFeedPosts($lasttime, $userid);
-        else if ($page == 'group' && $pageid != null) $posts = $p->getGroupPosts($lasttime, $userid, $pageid);
-        else if (($page == 'profile' || $page == 'myprofile') && $pageid != null) $posts = $p->getProfilePosts($lasttime, $userid, $pageid);
+        if ($page == 'feed') $posts = $o->getFeedPosts($lasttime, $userid);
+        else if ($page == 'group' && $pageid != null) $posts = $o->getGroupPosts($lasttime, $userid, $pageid);
+        else if (($page == 'profile' || $page == 'myprofile') && $pageid != null) $posts = $o->getProfilePosts($lasttime, $userid, $pageid);
         else $posts = [];
         echo json_encode($posts);
         return;
     }
-    public function like($id)
+    public function like($postid)
     {
-        //lajkuje ili brise lajk za post sa id-em id, za ulogovanog korisnika.
+        //lajkuje ili brise lajk za post sa id-em postid, za ulogovanog korisnika.
         //  1. Ako je post lajkovan vraca "liked"
         //  2. Ako je post unlikeovan vraca "unliked"
-        echo "liked";
+        $userid = $this->data['user']['id'];
+        $postid = (int)$postid;
+
+        //mozda bi trebalo dodati i proveru, ako je objava privatna, da li su korisnici prijatelji?
+        //iako korisnik nikako ne moze da vidi privatne objave korisnika koji mu nisu prijatelji, moze
+        //da posalje zahtev sa proizvoljnim postid, pa je pitanje da li u tom slucaju treba pamtiti to u bazi
+        $o = new Objava();
+        if ($o->liked($userid, $postid)) {
+            $o->unlike($userid, $postid);
+            echo "liked";
+        }
+        else {
+            $o->like($userid, $postid);
+            echo "unliked";
+        }
         return;
     }
     public function privatePost()
@@ -87,7 +101,7 @@ class User extends BaseController
         //vraca stranicu grupe id
         $this->data["group"] = TestData::$group;
         $this->data["joined"] = true;
-        $this->session->set('pageid', $id);
+        $this->session->set('pageid', (int)$id);
         $this->showPage('group', $this->data);
         return;
     }
@@ -115,7 +129,7 @@ class User extends BaseController
         //vraca profilnu stranicu
         //ako je id ulogovanog korisnika, onda vraca stranicu sa opcijom izmene profila
         $this->data["groups"] = [TestData::$group];
-        $this->session->set('pageid', $id);
+        $this->session->set('pageid', (int)$id);
         $this->showPage('myprofile', $this->data);
         return;
     }
