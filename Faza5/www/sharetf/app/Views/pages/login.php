@@ -12,12 +12,13 @@
     <body class = "login">
         <div class = "container my-5 py-5">
             <div class = "row offset-4 col-4">
-                <?php if ($success) { ?>
-                <div id = "success" class="alert alert-success" role="alert">
-                    Zahtev za registraciju je prosleđen administratoru! Očekujte odgovor u narednih 48h.
-                </div>
-                <?php } ?>
+                
                 <div id = "login">
+                    <?php if ($success) { ?>
+                    <div id = "success" class="alert alert-success" role="alert">
+                        Zahtev za registraciju je prosleđen administratoru! Očekujte odgovor u narednih 48h.
+                    </div>
+                    <?php } ?>
                     <form id = "login-form" method = "post" action = "/sharetf/public/index.php/Login/login">
                         <div class="mb-3">
                             <label for="login-email" class="form-label">Email</label>
@@ -38,16 +39,16 @@
                     <form id = "register-form" method = "post" action = "/sharetf/public/index.php/Login/register" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="register-email" class="form-label">Email</label>
-                            <input type="text" class="form-control" id="register-email" placeholder = "piggbbbbd@student.etf.bg.ac.rs" name = "email" value="<?= $register ? "" : set_value('email') ?>">
+                            <input type="text" class="form-control" id="register-email" placeholder = "piggbbbbd@student.etf.bg.ac.rs" name = "email" value="<?= $register ? set_value('email') : "" ?>">
                             <div id="register-email-error" class="form-text text-danger"><?= empty($errors['email']) ? '' : $errors['email']?></div>
                         </div>
                         <div class="mb-3">
                             <label for="register-name" class="form-label">Ime</label>
-                            <input type="text" class="form-control" id="register-name" name = "name" value="<?= $register ? "" : set_value('name') ?>">
+                            <input type="text" class="form-control" id="register-name" name = "name" value="<?= $register ? set_value('name') : "" ?>">
                         </div>
                         <div class="mb-3">
                             <label for="register-last-name" class="form-label">Prezime</label>
-                            <input type="text" class="form-control" id="register-last-name" name = "lastname" value="<?= $register ? "" : set_value('lastname') ?>">
+                            <input type="text" class="form-control" id="register-last-name" name = "lastname" value="<?= $register ? set_value('lastname') : "" ?>">
                         </div>
                         <div class="mb-3">
                             <label for="register-password" class="form-label">Lozinka</label>

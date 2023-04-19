@@ -2,6 +2,9 @@
 
 namespace App\Controllers;
 
+use App\Models\Korisnik;
+use App\Models\ZahtevZaRegistraciju;
+
 class Login extends BaseController
 {
     public function index()
@@ -23,6 +26,10 @@ class Login extends BaseController
         }
         else {
             //ovde treba u sesiji zapamtiti ulogovanog korisnika
+            $k = new Korisnik();
+            $user = $k->getUser($this->request->getVar('logemail'));
+            $user2 = ['id' => $user['IdK'], 'img' => $user['Slika'], 'name' => $user['Ime'] . ' ' . $user['Prezime'], 'type' => $user['Tip'], 'text' => $user['Opis']];
+            $this->session->set('user', $user2);
             return redirect()->to(site_url("User/feed"));
         }
     }
@@ -31,16 +38,23 @@ class Login extends BaseController
         //proverava sva polja za registraciju
         //ako je ok pamti u bazi
         //prikazuje odgovarajucu poruku
-        $data = ["register" => false, "success" => false];
         if (!$this->validate('register')) {
-            $data['errors'] = $this->validator->getErrors();
-            $data['register'] = true;
+            $data = ['register' => true, 'success' => false, 'errors' => $this->validator->getErrors()];
             echo view('pages/login', $data);
             return;
         }
         else {
             //ovde treba evidentirati novog korisnika
-            $data['success'] = true;
+            $z = new ZahtevZaRegistraciju();
+            $id = $z->addRequest($this->request->getVar('name'), $this->request->getVar('lastname'), $this->request->getVar('email'), $this->request->getVar('password'), 'tmp');
+            $file = $this->request->getFile('img');
+            if ($file->isValid()) {
+                $img = 'zahtev-' . $id . '.' . $file->getClientExtension();
+                $file->move('/wamp64/www/uploads', $img);
+                $img = "/wamp64/www/uploads/" . $img;
+            } else $img = "/wamp64/www/uploads/default.jpg";
+            $z->setImg($id, $img);
+            $data = ['register' => false, 'success' => true];
             echo view('pages/login', $data);
             return;
         }
