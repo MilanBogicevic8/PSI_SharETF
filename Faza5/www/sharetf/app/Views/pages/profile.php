@@ -1,4 +1,4 @@
-<!-- $profile = {"name", "text", "img", "id"}, $groups = [{"id", "img", "name"}] -->
+<!-- $profile = {"name", "text", "img", "id"}, $groups = [{"id", "img", "name"}], $friendstatus -->
             <div id = "profile-info" class = "bg-logo-blue-light">
               <div class="row border-bottom border-bottom-5 p-2 profile-info">
                 <div class="col-2"><img src="<?= $profile['img']?>" width="100%" class="rounded-1"></div>

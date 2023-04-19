@@ -90,11 +90,22 @@ class User extends BaseController
         //proverava polja i evidentira novu objavu
         //vraca stranicu feed
         if (!$this->validate('post')) $this->data['error'] = $this->combineErrors();
-        else {
-            //dodati post u bazu
-        }
+        else $this->addPost($this->data['user']['id'], null);
+        
         $this->showPage('feed', $this->data);
         return;
+    }
+    private function addPost($userid, $groupid) {
+        $date = date("Y-m-d H:i:s", time());
+        $o = new Objava();
+        $id = $o->addPost($this->request->getVar('text'), null, $date, $userid, $groupid);
+        $file = $this->request->getFile('img');
+        if ($file->isValid()) {
+            $img = 'objava-' . $id . '.' . $file->getClientExtension();
+            $file->move(UPLOAD_DIR, $img);
+            $img = UPLOAD_DIR . $img;
+            $o->setImg($id, $img);
+        }
     }
 
     public function group($id) {
@@ -115,12 +126,11 @@ class User extends BaseController
     public function groupPost($id) {
         //proverava polja i evidentira novu objavu u grupi id
         //vraca stranicu group
+        if (!$this->validate('post')) $this->data['error'] = $this->combineErrors();
+        else $this->addPost($this->data['user']['id'], $id);
+
         $this->data["group"] = TestData::$group;
         $this->data["joined"] = true;
-        if (!$this->validate('post')) $this->data['error'] = $this->combineErrors();
-        else {
-            //dodati post u bazu
-        }
         $this->showPage('group', $this->data);
         return;
     }

@@ -1,4 +1,4 @@
-lastPostDate = "2036/01/01 12:00:00";
+lastPostDate = "2036-01-01 12:00:00";
 currentlyFetching = false;
 
 function bottom() {

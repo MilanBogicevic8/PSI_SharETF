@@ -91,6 +91,24 @@ class Objava extends Model
             return $ret;
         }
 
+        //dodavanje posta
+        public function addPost($text, $img, $date, $userid, $groupid) {
+            $post = [
+                "tekst" => $text,
+                "slika" => $img,
+                "datumvreme" => $date,
+                "idk" => $userid,
+                "idg" => $groupid
+            ];
+            return $this->insert($post);
+        }
+
+        public function setImg($id, $img) {
+            return $this->update($id, [
+                'slika' => $img
+            ]);
+        }
+
         //lajkovi
         public function liked($userid, $postid) {
             $conn = $this->getConnection();
