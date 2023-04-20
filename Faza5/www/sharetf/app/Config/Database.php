@@ -52,7 +52,7 @@ class Database extends Config
         $result = $stmt->get_result();
         $ret = [];
         while (true) {
-            $t = $result->fetch_array();
+            $t = $result->fetch_assoc();
             if ($t == null) break;
             $ret[] = $t;
         }

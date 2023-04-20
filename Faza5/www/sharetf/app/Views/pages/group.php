@@ -32,7 +32,7 @@
             }
             $(document).ready(function() {
               $("#posts").append(makePostInput(user, "/sharetf/public/index.php/User/groupPost/<?=$group['id']?>", <?= empty($error) ? "'', null" : "`" . set_value('text') . "`, '$error'" ?>));
-              loadMorePosts(makePost);
+              loadPosts(makePost);
               $(window).scroll(function() {
                 loadMorePosts(makePost);
               })

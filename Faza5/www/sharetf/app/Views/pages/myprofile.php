@@ -54,7 +54,7 @@
                 $("#profile-editing").hide();
               });
               for (let i = 0; i < groups.length; i++) $("#profile-groups").append(makeGroupCard(groups[i]));
-              loadMorePosts(makePostWithGroup);
+              loadPosts(makePostWithGroup);
               $(window).scroll(function() {
                 loadMorePosts(makePostWithGroup);
               })

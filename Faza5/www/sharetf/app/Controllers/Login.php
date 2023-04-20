@@ -28,8 +28,8 @@ class Login extends BaseController
             //ovde treba u sesiji zapamtiti ulogovanog korisnika
             $k = new Korisnik();
             $user = $k->getUser($this->request->getVar('logemail'));
-            $user2 = ['id' => (int)$user['IdK'], 'img' => $user['Slika'], 'name' => $user['Ime'] . ' ' . $user['Prezime'], 'type' => $user['Tip'], 'text' => $user['Opis']];
-            $this->session->set('user', $user2);
+            $user = $k->rename($user);
+            $this->session->set('user', $user);
             return redirect()->to(site_url("User/feed"));
         }
     }
@@ -50,9 +50,9 @@ class Login extends BaseController
             $file = $this->request->getFile('img');
             if ($file->isValid()) {
                 $img = 'zahtev-' . $id . '.' . $file->getClientExtension();
-                $file->move(UPLOAD_DIR, $img);
-                $img = UPLOAD_DIR . $img;
-            } else $img = UPLOAD_DIR . "/default.jpg";
+                $file->move(ROOT_DIR . UPLOAD_DIR, $img);
+                $img = UPLOAD_DIR . "/" . $img;
+            } else $img = DEFAULT_PROF;
             $z->setImg($id, $img);
             $data = ['register' => false, 'success' => true];
             echo view('pages/login', $data);

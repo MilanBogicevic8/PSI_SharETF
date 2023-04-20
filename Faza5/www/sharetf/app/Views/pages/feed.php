@@ -30,7 +30,7 @@
             };
             $(document).ready(function() {
               $("#posts").append(makePostInput(user, "/sharetf/public/index.php/User/privatePost", <?= empty($error) ? "'', null" : "`" . set_value('text') . "`, '$error'" ?>));
-              loadMorePosts(makePostWithGroup);
+              loadPosts(makePostWithGroup);
               $(window).scroll(function() {
                 loadMorePosts(makePostWithGroup);
               })

@@ -95,4 +95,6 @@ define('EVENT_PRIORITY_HIGH', 10);
 
 
 // User defined
-defined('UPLOAD_DIR')   || define('UPLOAD_DIR', '/wamp64/www/uploads');
+defined('UPLOAD_DIR')   || define('UPLOAD_DIR', '/uploads');
+defined('DEFAULT_PROF')   || define('DEFAULT_PROF', '/uploads/default.jpg');
+defined('ROOT_DIR')   || define('ROOT_DIR', '/wamp64/www');

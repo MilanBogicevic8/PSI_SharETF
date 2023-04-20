@@ -5,8 +5,12 @@ function bottom() {
     return $(window).scrollTop() + $(window).height() > $(document).height() - 10;
 }
 function loadMorePosts(postMaker) {
-    if (currentlyFetching) return;
     if (!bottom()) return;
+    loadPosts(postMaker);
+}
+
+function loadPosts(postMaker) {
+    if (currentlyFetching) return;
     currentlyFetching = true;
     let xhr = new XMLHttpRequest();
 
@@ -41,5 +45,4 @@ function loadMorePosts(postMaker) {
     };
 
     xhr.send();
-
 }

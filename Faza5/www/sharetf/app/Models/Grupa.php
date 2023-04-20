@@ -50,5 +50,17 @@ class Grupa extends Model
             $conn->close();
             return $ret;
         }
+
+        public function getGroupsForProfile($userid) {
+            $conn = Database::getConnection();
+            $query = "select g.idg as id, g.slika as img, g.naziv as 'name'
+            from grupa g join jeclan j on g.idg = j.idg
+            where idk = ?";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("i", $userid);
+            $ret = Database::fetchResults($stmt);
+            $conn->close();
+            return $ret;
+        }
         
 }

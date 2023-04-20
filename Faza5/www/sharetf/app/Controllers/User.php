@@ -3,6 +3,7 @@
 namespace App\Controllers;
 use App\Models\Objava;
 use App\Models\Grupa;
+use App\Models\Korisnik;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -104,8 +105,8 @@ class User extends BaseController
         $file = $this->request->getFile('img');
         if ($file->isValid()) {
             $img = 'objava-' . $id . '.' . $file->getClientExtension();
-            $file->move(UPLOAD_DIR, $img);
-            $img = UPLOAD_DIR . $img;
+            $file->move(ROOT_DIR . UPLOAD_DIR, $img);
+            $img = UPLOAD_DIR . "/" . $img;
             $o->setImg($id, $img);
         }
     }
@@ -145,20 +146,44 @@ class User extends BaseController
 
     public function profile($id) {
         //vraca profilnu stranicu
-        //ako je id ulogovanog korisnika, onda vraca stranicu sa opcijom izmene profila
-        $this->data["groups"] = [TestData::$group];
-        $this->session->set('pageid', (int)$id);
-        $this->showPage('myprofile', $this->data);
+        //ako je id ulogovanog korisnika, onda vraca stranicu myprofile
+        $id = (int) $id;
+        $g = new Grupa();
+        $k = new Korisnik();
+        $this->data["groups"] = $g->getGroupsForProfile($id);
+        $this->session->set('page', 'profile'); $this->session->set('pageid', $id);
+        if ($this->data['user']['id'] == $id) $this->showPage('myprofile', $this->data);
+        else {
+            $this->data['profile'] = $k->rename($k->getUserById($id));
+            $this->data['friendstatus'] = $k->getFriendStatus($this->data['user']['id'], $id);
+            $this->showPage('profile', $this->data);
+        }
         return;
     }
     public function updateProfile() {
         //azurira informacije profila ulogovanog korisnika
         //vraca stranicu profila sa azuriranim informacijama
-        $this->data["groups"] = [TestData::$group];
+        $g = new Grupa();
+        $k = new Korisnik();
+        $userid = $this->data['user']['id'];
         if (!$this->validate('myprofile'))  $this->data['error'] = $this->combineErrors();
         else {
             //evidentirati promene
+            $file = $this->request->getFile('img');
+            if ($file->isValid()) {
+                $img = $this->data['user']['img'];
+                if ($img != DEFAULT_PROF && file_exists(ROOT_DIR . $img)) unlink(ROOT_DIR . $img);
+                $img = 'profil-' . $userid . '.' . $file->getClientExtension();
+                $file->move(ROOT_DIR . UPLOAD_DIR, $img);
+                $img = UPLOAD_DIR . "/" . $img;
+            } else $img = null;
+            $text = $this->request->getVar('text');
+            $k->updateProfile($userid, $text, $img);
+            $newuser = $k->rename($k->getUserById($userid));
+            $this->data['user'] = $newuser;
+            $this->session->set('user', $newuser);
         }
+        $this->data["groups"] = $g->getGroupsForProfile($userid);
         $this->showPage('myprofile', $this->data);
         return;
     }
@@ -170,7 +195,16 @@ class User extends BaseController
         //  3. Ako je korisnik vec prijatelj, brise se prijateljstvo
         //  4. U suprotnom zahtev se evidentira
         //vraca stranicu istog profila sa azuriranim podacima
-        return redirect()->to(site_url("User/profile/1"));
+        $id = (int)$id;
+        $userid = $this->data['user']['id'];
+        if ($userid == $id) return redirect()->to(site_url("User/prifile/$id"));
+        $k = new Korisnik();
+        $status = $k->getFriendStatus($userid, $id);
+        if ($status == "friends") $k->unfriend($userid, $id);
+        else if ($status == "requested") $k->unrequest($userid, $id);
+        else if ($status == "received") $k->accept($userid, $id);
+        else $k->request($userid, $id);
+        return redirect()->to(site_url("User/profile/$id"));
     }
 
     function comments($id) {

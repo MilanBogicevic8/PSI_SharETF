@@ -108,6 +108,7 @@ function makeCommentInput(profile, postid, text, error) {
 }
 
 function makeGroupCard(group) {
+    let id = group.id;
     let img = group.img;
     let name = group.name;
     return $("<div></div>").addClass("card m-2 ms-0 group-card").append(

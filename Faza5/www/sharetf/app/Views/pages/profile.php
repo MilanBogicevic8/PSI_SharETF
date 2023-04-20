@@ -1,4 +1,4 @@
-<!-- $profile = {"name", "text", "img", "id"}, $groups = [{"id", "img", "name"}], $friendstatus -->
+<!-- $profile = {"name", "text", "img", "id"}, $groups = [{"id", "img", "name"}], $friendstatus = "friends" / "requested" / "received" / "none" -->
             <div id = "profile-info" class = "bg-logo-blue-light">
               <div class="row border-bottom border-bottom-5 p-2 profile-info">
                 <div class="col-2"><img src="<?= $profile['img']?>" width="100%" class="rounded-1"></div>
@@ -18,7 +18,7 @@
                     <h4 class = "my-3">Grupe</h4>
                     
                 </div>
-                <div class="col-8 ps-5" id="profile-posts">
+                <div class="col-8 ps-5" id="posts">
                     <h4 class = "my-3">Objave</h4>
                 </div>
             </div>
@@ -40,7 +40,7 @@
             ]
             $(document).ready(function() {
               for (let i = 0; i < groups.length; i++) $("#profile-groups").append(makeGroupCard(groups[i]));
-              loadMorePosts(makePostWithGroup);
+              loadPosts(makePostWithGroup);
               $(window).scroll(function() {
                 loadMorePosts(makePostWithGroup);
               })
