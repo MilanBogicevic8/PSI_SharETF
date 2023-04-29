@@ -9,11 +9,13 @@ class Admin extends BaseController
     public function group()
     {
         //vraca stranicu admin-group
-        $data = ["user" => TestData::$user, "success" => false];
+        
+        $data = ["user" => $this->session->get("user"), "success" => false];
         echo view("template/header", $data);
         echo view("pages/admin-group", $data);
         return;
     }
+    
     public function addGroup() {
         //proverava polja i dodaje grupu za ulogovanog admina
         $data = ["user" => TestData::$user, "success" => false];
@@ -31,20 +33,7 @@ class Admin extends BaseController
         }
     }
     
-    public static $regrequests = [
-        [
-            "id" => 5,
-            "name" => "Janko Jankovic",
-            "img" => "/uploads/prof3.png",
-            "email" => "jj200035d@student.etf.bg.ac.rs"
-        ],
-        [
-            "id" => 6,
-            "name" => "Andjela Andjelic",
-            "img" => "/uploads/prof5.png",
-            "email" => "aa200035d@student.etf.bg.ac.rs"
-        ]
-    ];
+    
     
     public function requests() {
         //vraca stranicu sa svim zahtevima za registraciju

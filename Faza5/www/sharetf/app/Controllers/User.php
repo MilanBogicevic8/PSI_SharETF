@@ -256,10 +256,7 @@ class User extends BaseController
     
     function respond($id, $response) {
         //odgovara na zahtev za prijateljstvo od korisnika id u zavisnosti od response (yes ili no)
-        var_dump($this->data);
-        echo $id;
-        echo $response;
-        echo $this->data['user']['id'];
+        
        $db= \Config\Database::connect();
         if($response=="yes"){
             $db->query("insert into jeprijatelj (IdK1,IdK2) values(?,?)",[(int)$id,(int)$this->data['user']['id']]);
