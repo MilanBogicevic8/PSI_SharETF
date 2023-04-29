@@ -210,6 +210,7 @@ class User extends BaseController
     function comments($id) {
         //prikazuje stranicu sa komentarima za post id
         //proverava i da li ulogovani korisnik ima pravo pristupa do te objave (nema ako je privatna a autor nije prijatelj ulogovanog korisnika)
+        
         $this->data["post"] = TestData::$posts[0];
         $this->data['comments'] = TestData::$comments;
         $this->showPage('post', $this->data);
@@ -224,9 +225,44 @@ class User extends BaseController
         $this->showPage('post', $this->data);
     }
 
+     public static $requests = [
+        [
+            "id" => 5,
+            "name" => "Janko Jankovic",
+            "img" => "/uploads/prof3.png",
+            "text" => "Jankov opis"
+        ],
+        [
+            "id" => 6,
+            "name" => "Andjela Andjelic",
+            "img" => "/uploads/prof5.png",
+            "text" => "Andjelin opis"
+        ]
+    ];
     function requests() {
         //prikazuje stranicu sa zahtevima za prijateljstvo za ulogovanog korisnika,
-        $this->data["requests"] = TestData::$requests;
+        
+        $db= \Config\Database::connect();
+        
+        //dovati korisnike koji su poslali zahteve za prijateljsto idk1(ko salje)->idk2(ka kome se salje
+        
+        $res1=$db->query("select * from zahtevzaprijateljstvo where IdK2=?",[(int)$this->data['user']['id']])->getResult();
+        
+        $counter=count($res1);
+        
+        $reguests=[];
+        
+        
+        for($i=0;$i< $counter;$i++){
+            //dovatanje podataka za jednog korisnika koji nam je oslao zahtev
+            $res2=$db->query("select * from korisnik where IdK=?",[$res1[$i]->IdK1])->getResult();
+            
+            $requests[]=["id"=>$res1[$i]->IdK1,"name"=>$res2[0]->Ime." ".$res2[0]->Prezime,"img"=>$res2[0]->Slika,"text"=>$res2[0]->Opis];
+            
+        }
+        
+        
+        $this->data["requests"] = $requests;
         $this->showPage('requests', $this->data);
         return;
     }
