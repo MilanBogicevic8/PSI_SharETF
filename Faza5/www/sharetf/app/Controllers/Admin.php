@@ -30,9 +30,38 @@ class Admin extends BaseController
             return;
         }
     }
+    
+    public static $regrequests = [
+        [
+            "id" => 5,
+            "name" => "Janko Jankovic",
+            "img" => "/uploads/prof3.png",
+            "email" => "jj200035d@student.etf.bg.ac.rs"
+        ],
+        [
+            "id" => 6,
+            "name" => "Andjela Andjelic",
+            "img" => "/uploads/prof5.png",
+            "email" => "aa200035d@student.etf.bg.ac.rs"
+        ]
+    ];
+    
     public function requests() {
         //vraca stranicu sa svim zahtevima za registraciju
-        $data = ["user" => TestData::$user, "requests" => TestData::$regrequests];
+        $db= \Config\Database::connect();
+        
+        //dohvatanje svih zahteva za registraciju
+        $res1=$db->query("select * from zahtevzaregistraciju")->getResult();
+        
+        $count=count($res1);
+        
+        $reqrequests=[];
+        
+        for($i=0;$i<$count;$i++){
+            $reqrequests[]=["id"=>$res1[$i]->IdZah,"name"=>$res1[$i]->Ime." ".$res1[$i]->Prezime,"img"=>$res1[$i]->Slika,"email"=>$res1[$i]->Email];   
+        }
+        
+        $data = ["user" => $this->session->get("user"), "requests" => $reqrequests];
         echo view("template/header", $data);
         echo view("pages/admin-requests", $data);
         return;
