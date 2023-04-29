@@ -69,6 +69,17 @@ class Admin extends BaseController
     public function respond($id, $response) {
         //odgovara na zahtev id u zavisnosti od response (yes ili no)
         //vraca poruku o uspehu
-        return;
+        
+        $db= \Config\Database::connect();
+        if($response=="yes"){
+            $res1=$db->query("select * from zahtevzaregistraciju where IdZah=?",[(int)$id])->getResult();
+            var_dump($res1);
+            $db->query("insert into korisnik(Ime,Prezime,Email,Lozinka,Slika,Tip) values(?,?,?,?,?,?)",[$res1[0]->Ime,$res1[0]->Prezime,$res1[0]->Email,$res1[0]->Lozinka,$res1[0]->Slika,'R']);
+            $db->query("delete from zahtevzaregistraciju where idzah=?",[$id]);
+            return "Uspesno";
+        }else{
+            $db->query("delete from zahtevzaregistraciju where idzah=?",[$id]);
+            return "Ne uspesno";
+        }
     }
 }
