@@ -259,6 +259,7 @@ class User extends BaseController
     public function logout() {
         //brise session
         //vraca na login stranicu
+        $this->session->destroy();
         return redirect()->to(site_url("Login/index"));
     }
 
