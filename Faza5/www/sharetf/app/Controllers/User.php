@@ -226,6 +226,7 @@ class User extends BaseController
             $user=$this->session->get("user");
             var_dump($user);
             echo $user['id'];
+            
             $daLiJePrijatelj=$db->query("select * from jeprijatelj where IdK1=? and IdK2=? or IdK2=? and IdK1=?",[(int)$user['id'],(int)$rez1[0]->IdK,(int)$rez1[0]->IdK,(int)$user['id']])->getResult();
         
             if(count($daLiJePrijatelj)==0) return $redirect()->to(site_url ("User/feed"));
@@ -328,6 +329,10 @@ class User extends BaseController
     public function search() {
         $this->showPage('search', $this->data);
     }
+    
+    
+    
+    
     public function getSearchResults($term, $type) {
         //vraca json listu rezultata pretrage
         //specijalna vrednost za term je "all", i oznacava prikaz svih profila/grupa
@@ -343,9 +348,38 @@ class User extends BaseController
             }
         */
         
+        $requests=[];
         
+        $db= \Config\Database::connect();
         
-        echo json_encode(TestData::$requests);
+        //dohvata u zavisnosti od $term profile ili group
+        if($type=="profile"){
+            //dohvata sve profile koji u sebi imaju naziv term osim ako je term all tada dohvata sve profile
+            if($term!="all"){
+                $rez1=$db->query("select * from Korisnik where Ime like ? or Prezime like ? ",["%".$term."%","%".$term."%"])->getResult();
+            }else{
+                $rez1=$db->query("select * from Korisnik",[])->getResult();
+            }
+            for($i=0;$i<count($rez1);$i++){
+                $requests[]=["id"=>$rez1[$i]->IdK,"name"=>$rez1[$i]->Ime." ".$rez1[$i]->Prezime,"img"=>$rez1[$i]->Slika,"text"=>$rez1[$i]->Opis];
+            }
+            
+        }else if($type=="group"){
+            if($term!="all"){
+                $rez1=$db->query("select * from grupa where Naziv like ?",["%".$term."%"])->getResult();
+            }else{
+                $rez1=$db->query("select * from grupa")->getResult();
+            }
+            
+            for($i=0;$i<count($rez1);$i++){
+                $requests[]=["id"=>$rez1[$i]->IdG,"name"=>$rez1[$i]->Naziv,"img"=>$rez1[$i]->Slika,"text"=>$rez1[$i]->Opis];
+            }
+            
+        }
+        
+        //var_dump($requests);
+        
+        echo json_encode($requests);
         return;
     }
 
