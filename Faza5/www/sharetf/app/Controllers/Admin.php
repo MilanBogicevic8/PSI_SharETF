@@ -18,6 +18,7 @@ class Admin extends BaseController
     
     public function addGroup() {
         
+        //var_dump($_REQUEST);
         //proverava polja i dodaje grupu za ulogovanog admina
         $data = ["user" => $this->session->get('user'), "success" => false];
         if (!$this->validate('admingroup')) {
@@ -27,6 +28,14 @@ class Admin extends BaseController
             return;
         }
         else {
+            $name=$this->request->getVar("name");
+            $text=$this->request->getVar("text");
+            
+            //echo $_FILES['img']['name'];
+            
+            $db= \Config\Database::connect();
+            $db->query("insert into grupa(Naziv,Opis,Slika) values(?,?,?)",[$name,$text,"/uploads/".$_FILES['img']['name']]);
+            
             $data['success'] = true;
             echo view("template/header", $data);
             echo view("pages/admin-group", $data);
