@@ -16,6 +16,20 @@ class Admin extends BaseController
         return;
     }
     
+    
+    /*
+
+     $date = date("Y-m-d H:i:s", time());
+        $o = new Objava();
+        $id = $o->addPost($this->request->getVar('text'), null, $date, $userid, $groupid);
+        $file = $this->request->getFile('img');
+        if ($file->isValid()) {
+            $img = 'objava-' . $id . '.' . $file->getClientExtension();
+            $file->move(ROOT_DIR . UPLOAD_DIR, $img);
+            $img = UPLOAD_DIR . "/" . $img;
+            $o->setImg($id, $img);
+        }
+         */
     public function addGroup() {
         
         //var_dump($_REQUEST);
@@ -31,11 +45,20 @@ class Admin extends BaseController
             $name=$this->request->getVar("name");
             $text=$this->request->getVar("text");
             
-            //echo $_FILES['img']['name'];
-            
             $db= \Config\Database::connect();
-            $db->query("insert into grupa(Naziv,Opis,Slika) values(?,?,?)",[$name,$text,"/uploads/".$_FILES['img']['name']]);
-            
+            //echo $_FILES['img']['name'];
+            $file = $this->request->getFile('img');
+            $db->query("insert into grupa(Naziv,Opis) values(?,?)",[$name,$text]);
+            if ($file->isValid()) {
+                $id=$db->query("SELECT max(IdG) as max from grupa")->getResult();
+                echo $id[0]->max;
+                $img = 'grupa-' . $id[0]->max . '.' . $file->getClientExtension();
+                $file->move(ROOT_DIR . UPLOAD_DIR, $img);
+                $img = UPLOAD_DIR . "/" . $img;
+                echo $img;
+                $db->query("update grupa g set g.Slika=? where g.IdG=?",[$img,$id[0]->max]);
+            }
+              
             $data['success'] = true;
             echo view("template/header", $data);
             echo view("pages/admin-group", $data);
