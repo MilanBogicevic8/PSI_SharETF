@@ -229,7 +229,7 @@ class User extends BaseController
             
             $daLiJePrijatelj=$db->query("select * from jeprijatelj where IdK1=? and IdK2=? or IdK2=? and IdK1=?",[(int)$user['id'],(int)$rez1[0]->IdK,(int)$rez1[0]->IdK,(int)$user['id']])->getResult();
         
-            if(count($daLiJePrijatelj)==0) return redirect()->to(site_url ("User/feed"));
+            if(count($daLiJePrijatelj)==0 && $this->session->get("user")!=$id ) return redirect()->to(site_url ("User/feed"));
         }
         
         
