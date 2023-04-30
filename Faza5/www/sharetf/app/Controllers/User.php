@@ -211,6 +211,56 @@ class User extends BaseController
         //prikazuje stranicu sa komentarima za post id
         //proverava i da li ulogovani korisnik ima pravo pristupa do te objave (nema ako je privatna a autor nije prijatelj ulogovanog korisnika)
         
+        
+        $db= \Config\Database::connect();
+        
+        //dohvata objavu
+        $rez1=$db->query("select * from objava where IdObj=?",[$id])->getResult();
+        if(count($rez1)==0) return redirect()->to(site_url("User/feed")); //ako objava ne postoji vraca se ma pocetnu stranu
+        
+        //da li je grupna ili privatna objava
+        
+        $staJe=($rez1[0]->IdG==null?"privatna":"grupna");
+        
+        if($staJe=="privatna"){
+            $user=$this->session->get("user");
+            var_dump($user);
+            echo $user['id'];
+            $daLiJePrijatelj=$db->query("select * from jeprijatelj where IdK1=? and IdK2=? or IdK2=? and IdK1=?",[(int)$user['id'],(int)$rez1[0]->IdK,(int)$rez1[0]->IdK,(int)$user['id']])->getResult();
+        
+            if(count($daLiJePrijatelj)==0) return $redirect()->to(site_url ("User/feed"));
+        }
+        //dohvata broj lajkova za tu objavu
+        $rez2=$db->query("select count(*) as Broj from lajkovao where IdObj=?",[$id])->getResult();
+        
+        //dohvata komentare za objavu
+        $rez3=$db->query("select * from komentar where IdObj=?",[$id])->getResult();
+        
+        //dohvata korinsika koji je napisao tu objavu
+        $rez4=$db->query("select * from korisnik where IdK=?",[$rez1[0]->IdK])->getResult();
+        
+        
+        if($staJe=="privatna"){
+            $posts=["id"=>$id,"text"=>$rez1[0]->Tekst,"likenum"=>$rez2[0]->Broj,"commentnum"=>count($rez3),"date"=>$rez1[0]->DatumVreme,"userid"=>$rez1[0]->IdK,"username"=>$rez4[0]->Ime." ".$rez4[0]->Prezime,"userimg"=>$rez4[0]->Slika];
+        }else{
+            //dohvati grupu u kojoj je napisana objava
+            $rez5=$db->query("select * from grupa where IdG=?",[$rez1[0]->IdG])->getResult();
+            $posts=["id"=>$id,"text"=>$rez1[0]->Tekst,"likenum"=>$rez2[0]->Broj,"commentnum"=>count($rez3),"date"=>$rez1[0]->DatumVreme,"userid"=>$rez1[0]->IdK,"username"=>$rez4[0]->Ime." ".$rez4[0]->Prezime,"userimg"=>$rez4[0]->Slika,"groupid"=>$rez1[0]->IdG,"groupname"=>$rez5[0]->Naziv];
+        } 
+    
+        $comments=[];
+        
+        for($i=0;$i<count($rez3);$i++){
+            //dohvata korisnika koji je napisao komentar na tu objavu
+            $rez7=$db->query("select * from korisnik where IdK=?",[$rez3[$i]->IdK])->getResult();
+            
+            $comments[]=["username"=>$rez7[0]->Ime." ".$rez7[0]->Prezime,"userid"=>$rez3[$i]->IdK,"userimg"=>$rez7[$i]->Slika,"text"=>$rez3[$i]->Tekst];
+        }
+        
+        var_dump($comments);
+        //ostalo jos sta je liked
+        
+        
         $this->data["post"] = TestData::$posts[0];
         $this->data['comments'] = TestData::$comments;
         $this->showPage('post', $this->data);
@@ -219,6 +269,7 @@ class User extends BaseController
     function addComment($id) {
         //dodaje komentar na post id, za ulogovanog korisnika
         //vraca stranicu sa azuriranim komentarima
+        
         $this->data["post"] = TestData::$posts[0];
         $this->data['comments'] = TestData::$comments;
         if (!$this->validate('comment')) $this->data['error'] = $this->combineErrors();
@@ -258,6 +309,14 @@ class User extends BaseController
         //odgovara na zahtev za prijateljstvo od korisnika id u zavisnosti od response (yes ili no)
         
        $db= \Config\Database::connect();
+       $daLiJePrazno=$db->query("select * from zahtevzaprijateljstvo where IdK1= ? and IdK2=?",[(int)$id,(int)$this->data['user']['id']]);
+       
+       if(count($daLiJePrazno)==0) return redirect()->to (site_url ("User/requests"));
+       
+        $daLiJePrazno=$db->query("select * from zahtevzaregistraciju where IdZah=?",[(int)$id])->getResult();
+        
+        if(count($daLiJePrazno)==0) return redirect()->to (site_url ("Admin/requests"));
+        
         if($response=="yes"){
             $db->query("insert into jeprijatelj (IdK1,IdK2) values(?,?)",[(int)$id,(int)$this->data['user']['id']]);
         }
@@ -283,6 +342,9 @@ class User extends BaseController
                 text: "Opis"
             }
         */
+        
+        
+        
         echo json_encode(TestData::$requests);
         return;
     }
