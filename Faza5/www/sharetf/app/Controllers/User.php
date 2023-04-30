@@ -312,11 +312,8 @@ class User extends BaseController
        $db= \Config\Database::connect();
        $daLiJePrazno=$db->query("select * from zahtevzaprijateljstvo where IdK1= ? and IdK2=?",[(int)$id,(int)$this->data['user']['id']]);
        
-       if(count($daLiJePrazno)==0) return redirect()->to (site_url ("User/requests"));
+       if(count($daLiJePrazno)==0) {return redirect()->to (site_url ("User/requests"));}
        
-        $daLiJePrazno=$db->query("select * from zahtevzaregistraciju where IdZah=?",[(int)$id])->getResult();
-        
-        if(count($daLiJePrazno)==0) return redirect()->to (site_url ("Admin/requests"));
         
         if($response=="yes"){
             $db->query("insert into jeprijatelj (IdK1,IdK2) values(?,?)",[(int)$id,(int)$this->data['user']['id']]);

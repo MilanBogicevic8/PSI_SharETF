@@ -17,6 +17,7 @@ class Admin extends BaseController
     }
     
     public function addGroup() {
+        
         //proverava polja i dodaje grupu za ulogovanog admina
         $data = ["user" => TestData::$user, "success" => false];
         if (!$this->validate('admingroup')) {
@@ -60,6 +61,11 @@ class Admin extends BaseController
         //vraca poruku o uspehu
         
         $db= \Config\Database::connect();
+        
+        $daLiJePrazno=$db->query("select * from zahtevzaregistraciju where IdK1= ? and IdK2=?",[(int)$id,(int)$this->data['user']['id']]);
+       
+       if(count($daLiJePrazno)==0) {return redirect()->to (site_url ("User/requests"));}
+       
         if($response=="yes"){
             $res1=$db->query("select * from zahtevzaregistraciju where IdZah=?",[(int)$id])->getResult();
             var_dump($res1);
