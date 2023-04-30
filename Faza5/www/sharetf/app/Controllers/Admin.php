@@ -19,7 +19,7 @@ class Admin extends BaseController
     public function addGroup() {
         
         //proverava polja i dodaje grupu za ulogovanog admina
-        $data = ["user" => TestData::$user, "success" => false];
+        $data = ["user" => $this->session->get('user'), "success" => false];
         if (!$this->validate('admingroup')) {
             $data['errors'] = $this->validator->getErrors();
             echo view("template/header", $data);

@@ -216,7 +216,7 @@ class User extends BaseController
         
         //dohvata objavu
         $rez1=$db->query("select * from objava where IdObj=?",[$id])->getResult();
-        if(count($rez1)==0) return redirect()->to(site_url("User/feed")); //ako objava ne postoji vraca se ma pocetnu stranu
+        if(count($rez1)==0) return redirect()->to(site_url("User/feed")); //ako objava ne postoji vraca se na pocetnu stranu
         
         //da li je grupna ili privatna objava
         
@@ -280,9 +280,72 @@ class User extends BaseController
         //dodaje komentar na post id, za ulogovanog korisnika
         //vraca stranicu sa azuriranim komentarima
         
-        $this->data["post"] = TestData::$posts[0];
-        $this->data['comments'] = TestData::$comments;
+        $db= \Config\Database::connect();
+        //var_dump($_REQUEST);
+        $comment=$this->request->getVar("text");
+        
+        
+        
+        
         if (!$this->validate('comment')) $this->data['error'] = $this->combineErrors();
+        
+        if(empty($this->data['error'])){
+            
+            $db->query("insert into komentar(IdK,IdObj,Tekst) values (?,?,?)",[$this->session->get("user")['id'],$id,$comment]);
+        }
+        
+        
+        //dohvata objavu
+        $rez1=$db->query("select * from objava where IdObj=?",[$id])->getResult();
+        if(count($rez1)==0) return redirect()->to(site_url("User/feed")); //ako objava ne postoji vraca se na pocetnu stranu
+        
+        //da li je grupna ili privatna objava
+        
+        $staJe=($rez1[0]->IdG==null?"privatna":"grupna");
+        
+        
+        
+        //dohvata broj lajkova za tu objavu
+        $rez2=$db->query("select count(*) as Broj from lajkovao where IdObj=?",[$id])->getResult();
+        
+        //dohvata komentare za objavu
+        $rez3=$db->query("select * from komentar where IdObj=?",[$id])->getResult();
+        
+        //dohvata korinsika koji je napisao tu objavu
+        $rez4=$db->query("select * from korisnik where IdK=?",[$rez1[0]->IdK])->getResult();
+        
+        //proverava da li je osoba koja je poslala zahtev lajkovala tu objavu
+        $rez8=$db->query("select * from korisnik k where k.IdK=? and k.IdK in (select l.IdK from lajkovao l where l.idobj=?)",[$this->session->get('user')['id'],(int)$id])->getResult();
+        $daLiJeLajkovao=count($rez8);
+        
+        if($staJe=="privatna"){
+            $posts=["id"=>$id,"text"=>$rez1[0]->Tekst,"likenum"=>$rez2[0]->Broj,"liked"=>$daLiJeLajkovao,"commentnum"=>count($rez3),"date"=>$rez1[0]->DatumVreme,"userid"=>$rez1[0]->IdK,"username"=>$rez4[0]->Ime." ".$rez4[0]->Prezime,"userimg"=>$rez4[0]->Slika];
+        }else{
+            //dohvati grupu u kojoj je napisana objava
+            $rez5=$db->query("select * from grupa where IdG=?",[$rez1[0]->IdG])->getResult();
+            $posts=["id"=>$id,"text"=>$rez1[0]->Tekst,"likenum"=>$rez2[0]->Broj,"liked"=>$daLiJeLajkovao,"commentnum"=>count($rez3),"date"=>$rez1[0]->DatumVreme,"userid"=>$rez1[0]->IdK,"username"=>$rez4[0]->Ime." ".$rez4[0]->Prezime,"userimg"=>$rez4[0]->Slika,"groupid"=>$rez1[0]->IdG,"groupname"=>$rez5[0]->Naziv];
+        } 
+    
+        $comments=[];
+        
+        //var_dump($rez3);
+        
+        $count2=count($rez3);
+        for($i=0;$i<$count2;$i++){
+            //dohvata korisnika koji je napisao komentar na tu objavu
+            
+            $rez7=$db->query("select * from korisnik where IdK=?",[$rez3[$i]->IdK])->getResult();
+            
+            $comments[]=["username"=>$rez7[0]->Ime." ".$rez7[0]->Prezime,"userid"=>$rez3[$i]->IdK,"userimg"=>$rez7[0]->Slika,"text"=>$rez3[$i]->Tekst];
+        }
+        
+        
+        //ostalo jos sta je liked
+        
+        
+        $this->data["post"] = $posts;
+        $this->data['comments'] = $comments;
+        
         $this->showPage('post', $this->data);
     }
 
