@@ -382,7 +382,7 @@ class User extends BaseController
         //odgovara na zahtev za prijateljstvo od korisnika id u zavisnosti od response (yes ili no)
         
        $db= \Config\Database::connect();
-       $daLiJePrazno=$db->query("select * from zahtevzaprijateljstvo where IdK1= ? and IdK2=?",[(int)$id,(int)$this->data['user']['id']]);
+       $daLiJePrazno=$db->query("select * from zahtevzaprijateljstvo where IdK1= ? and IdK2=?",[(int)$id,(int)$this->data['user']['id']])->getResult();
        
        if(count($daLiJePrazno)==0) {return redirect()->to (site_url ("User/requests"));}
        

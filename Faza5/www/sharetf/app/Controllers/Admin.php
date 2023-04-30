@@ -81,9 +81,8 @@ class Admin extends BaseController
         
         $db= \Config\Database::connect();
         
-        $daLiJePrazno=$db->query("select * from zahtevzaregistraciju where IdK1= ? and IdK2=?",[(int)$id,(int)$this->data['user']['id']]);
-       
-       if(count($daLiJePrazno)==0) {return redirect()->to (site_url ("User/requests"));}
+        $daLiJePrazno=$db->query("select * from zahtevzaregistraciju where IdZah=?",[(int)$id])->getResult();
+        if(count($daLiJePrazno)==0) {return redirect()->to (site_url ("User/requests"));}
        
         if($response=="yes"){
             $res1=$db->query("select * from zahtevzaregistraciju where IdZah=?",[(int)$id])->getResult();
