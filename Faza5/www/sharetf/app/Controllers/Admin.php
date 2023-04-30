@@ -17,19 +17,6 @@ class Admin extends BaseController
     }
     
     
-    /*
-
-     $date = date("Y-m-d H:i:s", time());
-        $o = new Objava();
-        $id = $o->addPost($this->request->getVar('text'), null, $date, $userid, $groupid);
-        $file = $this->request->getFile('img');
-        if ($file->isValid()) {
-            $img = 'objava-' . $id . '.' . $file->getClientExtension();
-            $file->move(ROOT_DIR . UPLOAD_DIR, $img);
-            $img = UPLOAD_DIR . "/" . $img;
-            $o->setImg($id, $img);
-        }
-         */
     public function addGroup() {
         
         //var_dump($_REQUEST);
