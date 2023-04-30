@@ -224,13 +224,15 @@ class User extends BaseController
         
         if($staJe=="privatna"){
             $user=$this->session->get("user");
-            var_dump($user);
-            echo $user['id'];
+            //var_dump($user);
+            //echo $user['id'];
             
             $daLiJePrijatelj=$db->query("select * from jeprijatelj where IdK1=? and IdK2=? or IdK2=? and IdK1=?",[(int)$user['id'],(int)$rez1[0]->IdK,(int)$rez1[0]->IdK,(int)$user['id']])->getResult();
         
             if(count($daLiJePrijatelj)==0) return $redirect()->to(site_url ("User/feed"));
         }
+        
+        
         //dohvata broj lajkova za tu objavu
         $rez2=$db->query("select count(*) as Broj from lajkovao where IdObj=?",[$id])->getResult();
         
@@ -240,30 +242,37 @@ class User extends BaseController
         //dohvata korinsika koji je napisao tu objavu
         $rez4=$db->query("select * from korisnik where IdK=?",[$rez1[0]->IdK])->getResult();
         
+        //proverava da li je osoba koja je poslala zahtev lajkovala tu objavu
+        $rez8=$db->query("select * from korisnik k where k.IdK=? and k.IdK in (select l.IdK from lajkovao l where l.idobj=?)",[$this->session->get('user')['id'],(int)$id])->getResult();
+        $daLiJeLajkovao=count($rez8);
         
         if($staJe=="privatna"){
-            $posts=["id"=>$id,"text"=>$rez1[0]->Tekst,"likenum"=>$rez2[0]->Broj,"commentnum"=>count($rez3),"date"=>$rez1[0]->DatumVreme,"userid"=>$rez1[0]->IdK,"username"=>$rez4[0]->Ime." ".$rez4[0]->Prezime,"userimg"=>$rez4[0]->Slika];
+            $posts=["id"=>$id,"text"=>$rez1[0]->Tekst,"likenum"=>$rez2[0]->Broj,"liked"=>$daLiJeLajkovao,"commentnum"=>count($rez3),"date"=>$rez1[0]->DatumVreme,"userid"=>$rez1[0]->IdK,"username"=>$rez4[0]->Ime." ".$rez4[0]->Prezime,"userimg"=>$rez4[0]->Slika];
         }else{
             //dohvati grupu u kojoj je napisana objava
             $rez5=$db->query("select * from grupa where IdG=?",[$rez1[0]->IdG])->getResult();
-            $posts=["id"=>$id,"text"=>$rez1[0]->Tekst,"likenum"=>$rez2[0]->Broj,"commentnum"=>count($rez3),"date"=>$rez1[0]->DatumVreme,"userid"=>$rez1[0]->IdK,"username"=>$rez4[0]->Ime." ".$rez4[0]->Prezime,"userimg"=>$rez4[0]->Slika,"groupid"=>$rez1[0]->IdG,"groupname"=>$rez5[0]->Naziv];
+            $posts=["id"=>$id,"text"=>$rez1[0]->Tekst,"likenum"=>$rez2[0]->Broj,"liked"=>$daLiJeLajkovao,"commentnum"=>count($rez3),"date"=>$rez1[0]->DatumVreme,"userid"=>$rez1[0]->IdK,"username"=>$rez4[0]->Ime." ".$rez4[0]->Prezime,"userimg"=>$rez4[0]->Slika,"groupid"=>$rez1[0]->IdG,"groupname"=>$rez5[0]->Naziv];
         } 
     
         $comments=[];
         
-        for($i=0;$i<count($rez3);$i++){
+        //var_dump($rez3);
+        
+        $count2=count($rez3);
+        for($i=0;$i<$count2;$i++){
             //dohvata korisnika koji je napisao komentar na tu objavu
+            
             $rez7=$db->query("select * from korisnik where IdK=?",[$rez3[$i]->IdK])->getResult();
             
-            $comments[]=["username"=>$rez7[0]->Ime." ".$rez7[0]->Prezime,"userid"=>$rez3[$i]->IdK,"userimg"=>$rez7[$i]->Slika,"text"=>$rez3[$i]->Tekst];
+            $comments[]=["username"=>$rez7[0]->Ime." ".$rez7[0]->Prezime,"userid"=>$rez3[$i]->IdK,"userimg"=>$rez7[0]->Slika,"text"=>$rez3[$i]->Tekst];
         }
         
-        var_dump($comments);
+        
         //ostalo jos sta je liked
         
         
-        $this->data["post"] = TestData::$posts[0];
-        $this->data['comments'] = TestData::$comments;
+        $this->data["post"] = $posts;
+        $this->data['comments'] = $comments;
         $this->showPage('post', $this->data);
         return;
     }
