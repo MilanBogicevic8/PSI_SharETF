@@ -1,0 +1,58 @@
+/* Autor: Aleksa Vučković */
+/*Opste*/
+body {
+    overflow-x:hidden;
+}
+.container > .row {
+    margin-left: auto;
+    margin-right: auto
+}/*Iz nekog razloga ovo mora da postoji da redovi ne bi imali margine -30px*/
+
+/*Login*/
+.login .vertical-img {
+    background-image: url("/sharetf/public/images/login-vertical.png");
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    padding-bottom: 800px;
+}
+.login .horizontal-img {
+    background-image: url("/sharetf/public/images/login-horizontal.png");
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    min-height: 75px;
+}
+
+/*Header*/
+.bg-logo-blue {
+    background-color: #005df3;
+}
+.bg-logo-blue-light {
+    background-color: #b4d6ff
+}
+.header img {
+    width: 150px;
+}
+.header {
+    background-color: #005df3;
+}
+.footer {
+    text-align: center;
+}
+
+/*Ostalo*/
+.post img {
+    vertical-align:baseline;
+}
+.post-data {
+    font-weight: bold;
+}
+.post-data a {
+    color: black;
+}
+.post-interactions i:hover, .profile-info i:hover {
+    cursor: pointer
+}
+.search-preview:hover, .group-card:hover {
+    cursor: pointer;
+    border-width: 2px;
+}
